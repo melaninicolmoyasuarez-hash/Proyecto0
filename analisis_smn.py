@@ -1,5 +1,4 @@
-import sys 
-import zipfile
+import sys
 
 def viento(campo_viento):
     """ 
@@ -24,7 +23,7 @@ def viento(campo_viento):
     return(campo_viento, None)
 
 def st_float(texto):
-    "convierte texto a float, sacando las barras '/' y los espacios"
+    "convierte texto a float, sacando las barras '/', guiones y 'nose calcula'"
     texto= texto.strip().replace('/', '').strip()
     if texto == "" or texto == "-" or texto.lower()== "no se calcula":
         return None
@@ -34,48 +33,44 @@ def st_float(texto):
         return None
     
 def observaciones(ruta):
-    """lee el archivo y devuelve un dict con las observaciones por ciudad"""
+    """lee el archivo y devuelve un dict con las observaciones por ciudad y el total de lineas 
+    mal formadas"""
     observ = {}
-    lineas= []
+    lineas_i= 0
     try:
-        if zipfile.is_zipfile(ruta):
-            with zipfile.ZipFile(ruta, 'r') as file:
-                n_archivo= file.namelist()[0]
-                with file.open(n_archivo) as f:
-                    lineas = [l.decode('latin-1', errors= 'ignore') for l in f]
-        else:
-            with open(ruta, 'r', encoding='latin-1', errors='ignore') as file:
-                lineas = file.readlines()
-        for x in lineas:
-            linea= x.strip()
-            if not linea:
-                continue
+        with open(ruta, 'r', encoding='latin-1', errors='ignore') as file:
+            for x in file:
+                linea= x.strip()
+                if not linea:
+                    continue
 
-            campos= linea.split(";")
-            if len(campos) < 10:
-                continue
+                campos= linea.split(";")
+                if len(campos) != 10:
+                    lineas_i += 1
+                    continue
 
-            ciudad= campos[0].strip()
-            if not ciudad:
-                continue
+                ciudad= campos[0].strip()
+                if not ciudad:
+                    lineas_i += 1
+                    continue
 
-            dire_v, veloc_v= viento(campos[8])
+                dire_v, veloc_v= viento(campos[8])
 
-            observ[ciudad]= {
-                "fecha": campos[1].strip(),
-                "hora": campos[2].strip(),
-                "condicion": campos[3].strip(),
-                "visibilidad": campos[4].strip(),
-                "temperatura": st_float(campos[5]),
-                "sensacion_termica": st_float(campos[6]),
-                "humedad": st_float(campos[7]),
-                "direccion_del_viento": dire_v,
-                "velocidad_del_viento": veloc_v,
-                "presion": st_float(campos[9])
-            }
+                observ[ciudad]= {
+                    "fecha": campos[1].strip(),
+                    "hora": campos[2].strip(),
+                    "condicion": campos[3].strip(),
+                    "visibilidad": campos[4].strip(),
+                    "temperatura": st_float(campos[5]),
+                    "sensacion_termica": st_float(campos[6]),
+                    "humedad": st_float(campos[7]),
+                    "direccion_del_viento": dire_v,
+                    "velocidad_del_viento": veloc_v,
+                    "presion": st_float(campos[9])
+                }
     except  FileNotFoundError:
       print("error: no se encontro el dato en ", ruta)
-    return observ   
+    return observ, lineas_i
    
 def cantidad_c(observ):
     """ devuelve el total de ciudades leidas"""
@@ -111,7 +106,7 @@ def top_ciudades(observ, campo, n=5, descendente= True):
     validos.sort(key=lambda x: x[1], reverse=descendente)
     return validos[:n]
 
-def mostrar_resumen(observ):
+def mostrar_resumen(observ, lineas_i):
     """Imprime por pantalla el resumen con todas las características calculada"""
     if not observ:
         print("no se encontraron datos para imprimir")
@@ -119,17 +114,29 @@ def mostrar_resumen(observ):
     print("RESUMEN DE OBSERVACIONES SMN")
     print("total de ciudades leidas: ", cantidad_c(observ))
     print("ciudades con datos completos: ", cantidad_c_completas(observ))
+    print("lineas descartadas/ mal formadas", lineas_i)
 
-    faltantes, e_campo= datos_faltantes(observ)
+    faltantes, afectados= datos_faltantes(observ)
     print("datos faltantes por campo: ", faltantes)
-    print("top 5 mas calidas: ", top_ciudades(observ, "temperatura", n=5, descendente=True))
-    print("top 5 mas fria: ", top_ciudades(observ, "temperatura", n=5, descendente= False))
+    print("estaciones afectadas por campo: ", afectados)
+
+    print("Extremos:")
+    print("temperatura max: ",top_ciudades(observ, "temperatura", n=1, descendente=True)[0])
+    print("temperatura min: ", top_ciudades(observ, "temperatura", n=1, descendente=False)[0])
+    print("viento maximo: ", top_ciudades(observ, "velocidad_del_viento", n=1, descendente= True)[0])
+    print("viento minimo: ", top_ciudades(observ, "velocidad_del_viento", n=1, descendente=False)[0])
+
+    print("Ranking (top 5):")
+    print("top 5 temperaturas mas calidas: ", top_ciudades(observ, "temperatura", n=5, descendente=True))
+    print("top 5 tempertauras mas frias: ", top_ciudades(observ, "temperatura", n=5, descendente= False))
     print("top 5 con mas viento: ", top_ciudades(observ, "velocidad_del_viento", n=5, descendente= True))
     print("top 5 con menos viento: ", top_ciudades(observ, "velocidad_del_viento", n=5, descendente= False))
+
+
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         ruta= sys.argv[1]
-        datos= observaciones(ruta)
-        mostrar_resumen(datos)
+        dato, invalido= observaciones(ruta)
+        mostrar_resumen(dato, invalido)
     else:
         print("falta indicar el archivo")
