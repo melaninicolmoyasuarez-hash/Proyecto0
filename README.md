@@ -29,4 +29,4 @@ Ranking (top 5):
 top 5 temperaturas mas calidas:  [('Tartagal', 32.5), ('Ramon Lista', 31.0), ('Oran', 30.2), ('Resistencia', 29.8), ('Formosa', 29.5)]
 top 5 tempertauras mas frias:  [('Base Marambio', -12.4), ('Ushuaia', -2.1), ('Río Grande', -1.0), ('Bariloche', 1.2), ('Esquel', 2.0)]
 top 5 con mas viento:  [('Comodoro Rivadavia', 45.0), ('Río Gallegos', 38.0), ('Trelew', 32.0), ('Bahía Blanca', 28.0), ('Neuquén', 25.0)]
-top 5 con menos viento:  [('Calafate', 0.0), ('San Luis', 0.0), ('La Rioja', 0.0), ('Catamarca', 2.0), ('Mendoza', 3.0)]
+top 5 con menos viento:  [('Calafate', 0.0), ('San Luis', 0.0), ('La Rioja', 0.0), ('Catamarca', 2.0), ('Mendoza', 3.0)].
