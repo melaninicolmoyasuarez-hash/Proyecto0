@@ -4,15 +4,25 @@ meses= {
     "enero": 1, "febrero":2, "marzo":3, "abril": 4, "mayo": 5, "junio":6, "julio":7, "agosto":8,
     "septiembre":9, "octubre": 10, "noviembre": 11, "diciembre": 12
     }
-def fecha_hora(fecha_str: str, hora_str: str) -> datetime:
+def fecha_hora(fecha_str, hora_str):
     fechas= fecha_str.strip().split('-')
-    dia= int(fechas[0])
-    mes= meses[fechas[1].lower()]
-    year= int(fechas[2])
+    m= fechas[0].strip()
+    m1=fechas[1].strip().lower()
+    m2=fechas[2].strip()
+    if len(m) == 4:
+        year= int(m)
+        mes= int(m1) if m1.isdigit() else meses[m1]
+        dia= int(m2)
+    else:
+        dia = int(m)
+        mes= int(m1) if m1.isdigit() else meses[m1]
+        year= int(m2)
+
     horas= hora_str.strip().split(':')
     hora= int(horas[0])
     minutos= int(horas[1])
     return datetime(year, mes, dia, hora, minutos)
+
 
 def viento(campo_viento):
     """ 
@@ -115,14 +125,23 @@ def top_ciudades(observ, campo, n=5, descendente= True):
     validos= []
     for ciudad, datos in observ.items():
         if datos.get(campo) is not None:
-            validos.append((ciudad, datos[campo]))
-    validos.sort(key=lambda x: x[1], reverse=descendente)
-    return validos[:n]
+            validos.append((datos[campo], ciudad))
+    validos.sort(reverse=descendente)
+    resultado= []
+    for valor, ciudad in validos[:n]:
+        resultado.append((ciudad, valor))
+    return resultado
 
 def horarios(observ):
     horario= set()
     for datos in observ.values():
         dt= datos.get("fecha_y_hora")
-        if isinstance(dt, datetime):
+        if isinstance(dt,datetime):
             horario.add(dt.strftime("%H:%M"))
     return sorted(list(horario))
+
+parsear_fecha_hora= fecha_hora
+separar_viento= viento
+
+def leer_observaciones(ruta):
+    return observaciones(ruta)[0]
