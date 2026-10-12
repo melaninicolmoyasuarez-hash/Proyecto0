@@ -19,7 +19,7 @@ def mostrar_resumen(observ, lineas_i):
     print("Extremos:")
     print("temperatura max: ",top_ciudades(observ, "temperatura", n=1, descendente=True)[0])
     print("temperatura min: ", top_ciudades(observ, "temperatura", n=1, descendente=False)[0])
-    print("viento maximo: ", top_ciudades(observ, "velocidad_viento", n=1, descendente= True)[0])
+    print("viento maximo: ", top_ciudades(observ, "velocidad_viento", n=1, descendente=True)[0])
     print("viento minimo: ", top_ciudades(observ, "velocidad_viento", n=1, descendente=False)[0])
 
     print("Ranking (top 5):")
