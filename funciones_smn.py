@@ -1,4 +1,7 @@
 from datetime import datetime
+import json
+import os
+import glob
 
 meses= {
     "enero": 1, "febrero":2, "marzo":3, "abril": 4, "mayo": 5, "junio":6, "julio":7, "agosto":8,
@@ -56,11 +59,24 @@ def st_float(texto):
     except ValueError:
         return None
 
+def dectectar_codificaciones(ruta):
+    """detecta si el archivo esta en utf-8 o latin-1"""
+    for enc in ('utf-8', 'latin-1'):
+        try:
+            with open(ruta, 'r', encoding=enc) as f:
+                f.read()
+            return enc
+        except UnicodeDecodeError:
+            continue
+    return 'utf-8'
+
 def observaciones(ruta):
     """lee el archivo y devuelve un dict con las observaciones por ciudad y el total de lineas 
     mal formadas"""
     observ = {}
     lineas_i= 0
+    enc = dectectar_codificaciones(ruta)
+
     try:
         with open(ruta, 'r') as file:
             for x in file:
@@ -145,3 +161,37 @@ separar_viento= viento
 
 def leer_observaciones(ruta):
     return observaciones(ruta)[0]
+
+def convertir_a_json(observ):
+    "convierte las fechas datetime a formato ISO 8601 sin segundos"
+    observ_j= {}
+    for ciudad, datos in observ.items():
+        datoss= datos.copy()
+        if isinstance(datoss.get('fecha_y_hora'), datetime):
+            datoss["fecha_y_hora"] = datoss["fecha_y_hora"].isformat(timespec= 'minutes')
+        observ_j[ciudad] = datoss
+    return observ_j
+
+def guardar_c_json(ruta_txt, observ):
+    """guarda el diccionario de observaciones en formato json en obs_j"""
+    print("archivo SMN, convirtiendose a Json")
+
+    d_destino= "obs_j"
+    if not os.path.exists(d_destino):
+        print(f"el diccionario {d_destino} no existe, procesando...")
+        os.mkdir(d_destino)
+        print("diccionario creando!")
+    else:
+        print(f"el diccionario {d_destino} ya existe")
+
+    nomb_archivo = ruta_txt.replace("datos/", "").raplace("datos\\", "")
+    ruta_j= os.path.join(d_destino, nomb_archivo)
+    observ_s= convertir_a_json(observ)
+
+    try:
+        with open(ruta_j, "w", encoding='utf-8') as f:
+            json.dump(observ_s, f)
+        print("archivo guardado correctactamente en", ruta_j)
+    except Exception as e:
+        print("error al guardad el archivo json: ", e)
+
