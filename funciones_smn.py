@@ -168,7 +168,7 @@ def convertir_a_json(observ):
     for ciudad, datos in observ.items():
         datoss= datos.copy()
         if isinstance(datoss.get('fecha_y_hora'), datetime):
-            datoss["fecha_y_hora"] = datoss["fecha_y_hora"].isformat(timespec= 'minutes')
+            datoss["fecha_y_hora"] = datoss["fecha_y_hora"].isoformat(timespec= 'minutes')
         observ_j[ciudad] = datoss
     return observ_j
 
@@ -184,7 +184,7 @@ def guardar_c_json(ruta_txt, observ):
     else:
         print(f"el diccionario {d_destino} ya existe")
 
-    nomb_archivo = ruta_txt.replace("datos/", "").raplace("datos\\", "")
+    nomb_archivo = ruta_txt.replace("datos/", "").replace("datos\\", "")
     ruta_j= os.path.join(d_destino, nomb_archivo)
     observ_s= convertir_a_json(observ)
 
@@ -194,4 +194,6 @@ def guardar_c_json(ruta_txt, observ):
         print("archivo guardado correctactamente en", ruta_j)
     except Exception as e:
         print("error al guardad el archivo json: ", e)
+
+
 
