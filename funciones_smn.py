@@ -156,8 +156,8 @@ def horarios(observ):
             horario.add(dt.strftime("%H:%M"))
     return sorted(list(horario))
 
-parsear_fecha_hora= fecha_hora
-separar_viento= viento
+parsear_fecha_hora = fecha_hora
+separar_viento = viento
 
 def leer_observaciones(ruta):
     return observaciones(ruta)[0]
@@ -201,6 +201,3 @@ def guardar_c_json(ruta_txt, observ):
         print("archivo guardado correctactamente en", ruta_j)
     except Exception as e:
         print("error al guardad el archivo json: ", e)
-
-
-
