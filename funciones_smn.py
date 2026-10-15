@@ -187,7 +187,7 @@ def guardar_c_json(ruta_txt, observ):
     if not os.path.exists(d_destino):
         print(f"el diccionario {d_destino} no existe, procesando...")
         os.mkdir(d_destino)
-        print("diccionario creando!")
+        print("diccionario creado!")
     else:
         print(f"el diccionario {d_destino} ya existe")
 
@@ -201,3 +201,13 @@ def guardar_c_json(ruta_txt, observ):
         print("archivo guardado correctactamente en", ruta_j)
     except Exception as e:
         print("error al guardad el archivo json: ", e)
+
+def contar_archivo():
+    """"""
+    cant_txt = 0
+    if os.path.exists("datos") and os.path.isdir("datos"):
+        cant_txt = len([f for f in os.listdir("obs_json") if f[-4:] == ".txt"])
+    cant_json= 0
+    if os.path.exists("obs_json") and os.path.isdir("obs_json"):
+        cant_json = len([f for f in os.path.isdir("obs_json") if f[-5:] == ".json"])
+    return cant_txt, cant_json

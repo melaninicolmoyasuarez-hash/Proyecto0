@@ -1,5 +1,6 @@
 import sys
-from funciones_smn import (observaciones, cantidad_c, cantidad_c_completas, datos_faltantes, top_ciudades, horarios)
+import os
+from funciones_smn import (observaciones, cantidad_c, cantidad_c_completas, datos_faltantes, top_ciudades, horarios, guardar_c_json, leer_observaciones_json, contar_archivo)
 
 def mostrar_resumen(observ, lineas_i):
     """Imprime por pantalla el resumen con todas las características calculada"""
@@ -30,9 +31,25 @@ def mostrar_resumen(observ, lineas_i):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        ruta= sys.argv[1]
-        dato, invalido= observaciones(ruta)
+    if len(sys.argv) > 2:
+        print("Se pasa mas de un parametro")
+    elif len(sys.argv) == 1:
+        print("no se indico ningun archivo")
+    cant_txt, cant_json = contar_archivo()
+    print(f"archivo .txt en 'datos/': {cant_txt}")
+    print(f"archivo .Json en 'obs_json/': {cant_json}")
+
+else:
+    ruta = sys.argv[1]
+    if ruta[-4:] == '.txt':
+        dato, invalido = observaciones(ruta)
+        guardar_c_json(ruta, dato)
         mostrar_resumen(dato, invalido)
+
+        print("ciudades que la contienen", cantidad_c((dato)))
+        print(f'{cantidad_c_completas(dato)}')
+    elif ruta[-5:] == '.json':
+        dato= leer_observaciones_json(ruta)
+        print("ciudades que cotienen el archivo", cantidad_c(dato))
     else:
-        print("falta indicar el archivo")
+        print("el archivo debe ser .txt o .json")
