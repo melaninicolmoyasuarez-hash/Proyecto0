@@ -78,7 +78,7 @@ def observaciones(ruta):
     enc = dectectar_codificaciones(ruta)
 
     try:
-        with open(ruta, 'r') as file:
+        with open(ruta, 'r', encoding=enc) as file:
             for x in file:
                 linea= x.strip()
                 if not linea:
@@ -162,6 +162,13 @@ separar_viento= viento
 def leer_observaciones(ruta):
     return observaciones(ruta)[0]
 
+def leer_observaciones_json(ruta):
+    "lee un archivo .json guardado antes en obs_json"
+    with open(ruta, 'r', encoding='utf-8') as f:
+        observ = json.load(f)
+    print("archivo leido")
+    return observ
+
 def convertir_a_json(observ):
     "convierte las fechas datetime a formato ISO 8601 sin segundos"
     observ_j= {}
@@ -176,7 +183,7 @@ def guardar_c_json(ruta_txt, observ):
     """guarda el diccionario de observaciones en formato json en obs_j"""
     print("archivo SMN, convirtiendose a Json")
 
-    d_destino= "obs_j"
+    d_destino= "obs_json"
     if not os.path.exists(d_destino):
         print(f"el diccionario {d_destino} no existe, procesando...")
         os.mkdir(d_destino)
